@@ -1,0 +1,159 @@
+﻿@model List<DBClassLib.Cuestionario>
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Index";
+}
+@{
+    <p class="text-center text-white fs-2">Reportes abiertos</p>
+    
+    <div class="container">
+            @Html.DropDownListFor(model => Model[0].Descripcion, (SelectList)ViewBag.Puestos, "Todos", htmlAttributes: new { @class = "form-control", @id = "filtrado" })
+        <table id="tablaEquipo" class="table table-hover table-dark table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Equipo solicitado</th>
+                    <th scope="col">Puesto que lo solicita</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Opciones</th>
+                </tr>
+            </thead>
+            @if (Model != null)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="IdQuiz">
+                            @Html.DisplayFor(modelItem =>item.IdCuestionario)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem =>item.Nombre)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem =>item.Descripcion)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem =>item.FechaLimite)
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" 
+                                id="btnEdit" 
+                                class="btn btn-warning" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#staticBackdrop" 
+                                data-id="@item.IdCuestionario" 
+                                data-nombre="@item.Nombre" 
+                                data-descripcion="@item.Descripcion" 
+                                data-fecha-limite="@item.FechaLimite">
+                                    Editar
+                                </button>
+
+                                <button type="button" class="btn btn-danger" onclick="location.href='@Url.Action("RemoveCuestionario", "JefeArea", new { IdCuestionario = item.IdCuestionario })'">
+                                    Borrar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>   
+                }
+            }
+        </table>
+    </div>
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header text-white">
+                    <h5 class="modal-title" id="staticBackdropLabel">Editar Cuestionario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                @using (Html.BeginForm("EditCuestionario", "JefeArea", FormMethod.Post))
+                {
+                    <form>
+                        <div class="modal-body">
+
+                            <input type="hidden" class="IdCuesHidden" name="IdCuestionario" value="" />
+
+                            <div class="form-outline mb-4">
+                                <input type="text" name="Nombre" id="formInput1" class="form-control"/>
+                                <label class="form-label text-white" for="formInput1">Equipo solicitado</label>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <input readonly="readonly" type="text" id="formInput2" name="Descripcion" class="form-control" />
+                                <label class="form-label text-white" for="formInput2">Puesto que lo solicita</label>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <input type="date" id="formInput3" name="FechaLimite" class="form-control" />
+                                <label class="form-label text-white" for="formInput3">Fecha</label>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary text-white" data-bs-dismiss="modal">Finalizar</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+
+    @section Scripts{
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $('#staticBackdrop').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget); //trigger
+                    var idCuestionario = button.data('id');  //weas que asigne para conseguir los datos del id
+                    var modal = $(this); //dis
+
+                    $.ajax({
+                        url: '@Url.Action("BuscarCuestionario", "JefeArea")', //el actionresult + el controlador en el que se encuentra
+                        type: 'GET', //pal recibir los datos
+                        data: { idCuestionario: idCuestionario }, //envia el id al controlador
+                        success: function (data) {
+                            modal.find('.IdCuesHidden').val(idCuestionario); //asigna todos los valores a mi modal
+                            modal.find('#formInput1').val(data.nombre);
+                            modal.find('#formInput2').val(data.descripcion);
+                            modal.find('#formInput3').val(data.fechaLimite);
+                        }
+                    });
+                });
+            });
+
+    </script>
+
+        <script type="text/javascript">
+            $("select").change(function () {
+                var selectedOption = $(this).children("option:selected").text();
+                $('#IdPuestoHidden').val(selectedOption);
+
+            });
+
+        </script>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#filtrado').change(function () {
+                    var selected = $(this).children("option:selected").text(); // get the selected option
+                    $('#tablaEquipo tbody tr').each(function () { // loop through each table row
+                        if (selected === 'Todos' || $(this).find('td:nth-child(3)').text().trim() === selected) {
+                            $(this).show(); // show the row if the selected option matches or if 'All' is selected
+                        } else {
+                            $(this).hide(); // hide the row if the selected option does not match
+                        }
+                    });
+                });
+            });
+
+        </script>
+
+
+    }
+
+}

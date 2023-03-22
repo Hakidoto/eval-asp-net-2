@@ -1,0 +1,48 @@
+﻿@{
+    var controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    var actionName = ViewContext.RouteData.Values["action"].ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Eval_1</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Eval_1.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <!-- Navbar -->
+        <nav class=" navbar navbar-expand-xxl navbar-dark bg-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler01" aria-controls="navbarToggler01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarToggler01">
+                    <a class="navbar-brand" href="#">Prueba</a>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a asp-controller="JefeArea" asp-action="AddTicket" class="nav-link @(controllerName == "JefeArea" && actionName == "AddTicket" ? "active" : "")" aria-current="page">Nuevo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="JefeArea" asp-action="ListTicket" class="nav-link @(controllerName == "JefeArea" && actionName == "ListTicket" ? "active" : "")" aria-current="page">Tickets de asistencia abiertos</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar -->
+    </header>
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
